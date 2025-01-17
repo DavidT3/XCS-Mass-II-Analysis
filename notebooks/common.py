@@ -9,13 +9,15 @@ from scipy.optimize import curve_fit, minimize
 from getdist import plots, MCSamples
 
 xcs_cosmo = LambdaCDM(70, 0.3, 0.7)
-xxl_cosmo = WMAP9
-locuss_cosmo = LambdaCDM(70, 0.3, 0.7)
 lovisari_cosmo = LambdaCDM(70, 0.3, 0.7)
 
-xcs3p_colour = 'tab:cyan'
-xxlgc100_colour = 'firebrick'
-locuss_colour = 'black'
+xcs_colour = 'tab:cyan'
+
+# We set up the normalisations to be used for different properties when fitting relations here, so they
+#  are kept common throughout the work
+tx_norm = Quantity(4, 'keV')
+m_norm = Quantity(1e+14, 'Msun')
+mgas_norm = Quantity(1e+13, 'Msun')
 
 
 # This function is used for getting axis limits for the the one to one comparison plots later
