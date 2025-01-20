@@ -10,6 +10,7 @@ from getdist import plots, MCSamples
 
 xcs_cosmo = LambdaCDM(70, 0.3, 0.7)
 lovisari_cosmo = LambdaCDM(70, 0.3, 0.7)
+arnaud_cosmo = LambdaCDM(70, 0.3, 0.7)
 
 xcs_colour = 'tab:cyan'
 
