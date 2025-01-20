@@ -17,6 +17,7 @@ xcs_colour = 'tab:cyan'
 # We set up the normalisations to be used for different properties when fitting relations here, so they
 #  are kept common throughout the work
 tx_norm = Quantity(4, 'keV')
+lx_norm = Quantity(1e+44, 'erg/s')
 m_norm = Quantity(1e+14, 'Msun')
 mgas_norm = Quantity(1e+13, 'Msun')
 
