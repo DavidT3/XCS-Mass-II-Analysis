@@ -28,3 +28,5 @@ dev*.ipynb
 radius_errors*.csv
 core*
 Untitled.ipynb
+sdssrm-xcs_txlx_v*.csv
+sdssrm-xcs_mass_v*.csv
