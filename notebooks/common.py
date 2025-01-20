@@ -11,6 +11,8 @@ from getdist import plots, MCSamples
 xcs_cosmo = LambdaCDM(70, 0.3, 0.7)
 lovisari_cosmo = LambdaCDM(70, 0.3, 0.7)
 arnaud_cosmo = LambdaCDM(70, 0.3, 0.7)
+andreon_cosmo = LambdaCDM(70, 0.3, 0.7)
+kiiveri_cosmo = LambdaCDM(70, 0.27, 0.73)
 
 xcs_colour = 'tab:cyan'
 
@@ -18,6 +20,7 @@ xcs_colour = 'tab:cyan'
 #  are kept common throughout the work
 tx_norm = Quantity(4, 'keV')
 lx_norm = Quantity(1e+44, 'erg/s')
+rich_norm = Quantity(100, '')
 m_norm = Quantity(1e+14, 'Msun')
 mgas_norm = Quantity(1e+13, 'Msun')
 
