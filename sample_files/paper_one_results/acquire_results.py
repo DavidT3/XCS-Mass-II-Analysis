@@ -7,7 +7,8 @@ from datetime import datetime
 release_ver = "v1.0.0"
 tx_url = "https://raw.githubusercontent.com/DavidT3/XCS-Mass-Paper-I-Analysis/refs/tags/{v}/"\
     "outputs/results/sdssrm-xcs_r500_r2500_txlx.csv".format(v=release_ver)
-mass_url = "https://github.com/DavidT3/XCS-Mass-Paper-I-Analysis/blob/{v}/outputs/results/sdssrm-xcs_masses.csv".format(v=release_ver)
+mass_url = "https://raw.githubusercontent.com/DavidT3/XCS-Mass-Paper-I-Analysis/refs/tags/{v}/"\
+    "outputs/results/sdssrm-xcs_masses.csv".format(v=release_ver)
 out_txlx_samp = "sdssrm-xcs_txlx_{v}.csv".format(v=release_ver)
 out_mass_samp = "sdssrm-xcs_mass_{v}.csv".format(v=release_ver)
 
