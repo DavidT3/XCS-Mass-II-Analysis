@@ -28,10 +28,10 @@ m_norm = Quantity(1e+14, 'Msun')
 mgas_norm = Quantity(1e+13, 'Msun')
 
 
-def leave_one_jackknife(full_samp, full_relation, x_cols=['Mhy500_wraderr', 'Mhy500_wraderr-', 'Mhy500_wraderr+'], 
-                        y_cols=['Tx_500', 'Tx_500-','Tx_500+'], x_name=r"$T_{\rm{X,500}}$", 
-                        y_name=r"$E(z)M^{\rm{tot}}_{500}$", dim_hubb_ind=1, x_mult=1, y_mult=1e+14, 
-                        x_norm=tx_norm, y_norm=m_norm):
+def leave_one_jackknife(full_samp, full_relation, y_cols=['Mhy500_wraderr', 'Mhy500_wraderr-', 'Mhy500_wraderr+'], 
+                        x_cols=['Tx_500', 'Tx_500-','Tx_500+'], y_name=r"$E(z)M^{\rm{tot}}_{500}$", 
+                        x_name=r"$T_{\rm{X,500}}$", dim_hubb_ind=1, y_mult=1e+14, x_mult=1, 
+                        y_norm=m_norm, x_norm=tx_norm):
     
     full_samp = full_samp.reset_index(drop=True)
     samp_inds = np.arange(0, len(full_samp))
@@ -43,9 +43,9 @@ def leave_one_jackknife(full_samp, full_relation, x_cols=['Mhy500_wraderr', 'Mhy
     leave_one_pars = []
     with tqdm(desc='Fitting sub-sample scaling relations', total=len(cur_sub_samps)) as onwards:
         for sub_samp_id, sub_samp in cur_sub_samps.items():
-            y_dat = Quantity(sub_samp[x_cols].values*y_mult, y_norm.unit)\
+            y_dat = Quantity(sub_samp[y_cols].values*y_mult, y_norm.unit)\
                 *(sub_samp['E'].values[..., None]**dim_hubb_ind)
-            x_dat = Quantity(sub_samp[y_cols].values, x_norm.unit)*x_mult
+            x_dat = Quantity(sub_samp[x_cols].values, x_norm.unit)*x_mult
             
             cur_subsamp_rel = scaling_relation_lira(y_dat[:, 0], y_dat[:, 1:], x_dat[:, 0], x_dat[:, 1:], y_norm, x_norm, 
                                                     y_name=y_name, x_name=x_name, dim_hubb_ind=dim_hubb_ind, 
