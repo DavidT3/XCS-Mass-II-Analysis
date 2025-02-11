@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import emcee as em
 from scipy.optimize import curve_fit, minimize
 from getdist import plots, MCSamples
+from tqdm import tqdm
 
 import xga
 from xga.relations.fit import scaling_relation_lira
@@ -34,7 +35,6 @@ def leave_one_jackknife(full_samp, full_relation, x_cols=['Mhy500_wraderr', 'Mhy
     
     full_samp = full_samp.reset_index(drop=True)
     samp_inds = np.arange(0, len(full_samp))
-    samp_inds = np.arange(0, 10)
     
     cur_sub_samps = {full_samp.loc[n, 'name']: full_samp.iloc[np.delete(samp_inds, n)] 
                      for n in range(0, len(samp_inds))}
