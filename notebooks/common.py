@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 import emcee as em
 from scipy.optimize import curve_fit, minimize
 from getdist import plots, MCSamples
+from tqdm import tqdm
+
+import xga
+from xga.relations.fit import scaling_relation_lira
 
 xcs_cosmo = LambdaCDM(70, 0.3, 0.7)
 lovisari_cosmo = LambdaCDM(70, 0.3, 0.7)
@@ -22,6 +26,103 @@ lx_norm = Quantity(1e+44, 'erg/s')
 rich_norm = Quantity(100, '')
 m_norm = Quantity(1e+14, 'Msun')
 mgas_norm = Quantity(1e+13, 'Msun')
+
+
+def leave_one_jackknife(full_samp, full_relation, y_cols=['Mhy500_wraderr', 'Mhy500_wraderr-', 'Mhy500_wraderr+'], 
+                        x_cols=['Tx_500', 'Tx_500-','Tx_500+'], y_name=r"$E(z)M^{\rm{tot}}_{500}$", 
+                        x_name=r"$T_{\rm{X,500}}$", dim_hubb_ind=1, y_mult=1e+14, x_mult=1, 
+                        y_norm=m_norm, x_norm=tx_norm):
+    
+    full_samp = full_samp.reset_index(drop=True)
+    samp_inds = np.arange(0, len(full_samp))
+    
+    cur_sub_samps = {full_samp.loc[n, 'name']: full_samp.iloc[np.delete(samp_inds, n)] 
+                     for n in range(0, len(samp_inds))}
+
+    leave_one_rels = {}
+    leave_one_pars = []
+    with tqdm(desc='Fitting sub-sample scaling relations', total=len(cur_sub_samps)) as onwards:
+        for sub_samp_id, sub_samp in cur_sub_samps.items():
+            y_dat = Quantity(sub_samp[y_cols].values*y_mult, y_norm.unit)\
+                *(sub_samp['E'].values[..., None]**dim_hubb_ind)
+            x_dat = Quantity(sub_samp[x_cols].values, x_norm.unit)*x_mult
+            
+            cur_subsamp_rel = scaling_relation_lira(y_dat[:, 0], y_dat[:, 1:], x_dat[:, 0], x_dat[:, 1:], y_norm, x_norm, 
+                                                    y_name=y_name, x_name=x_name, dim_hubb_ind=dim_hubb_ind, 
+                                                    point_names=sub_samp['name'].values)
+            cur_subsamp_rel.author = 'Turner et al.'
+            cur_subsamp_rel.year = 2025
+            cur_subsamp_rel.name = sub_samp_id + " excluded"
+    
+            # File away the output scaling relation instance
+            leave_one_rels[sub_samp_id] = cur_subsamp_rel
+
+            #
+            sc_perc_ch = round(((cur_subsamp_rel.scatter_par[0] - full_relation.scatter_par[0]) / 
+                                full_relation.scatter_par[0])*100, 3)
+            
+            # Add the parameters of the scaling relation fit to a list which we will write to disk later
+            leave_one_pars.append([sub_samp_id, *(cur_subsamp_rel.pars[0, :].round(4)), *(cur_subsamp_rel.pars[1, :].round(4)), 
+                                   *(cur_subsamp_rel.scatter_par.round(4)), sc_perc_ch])
+            
+            onwards.update(1)
+
+    leave_one_pars = pd.DataFrame(leave_one_pars, columns=['dropped_cluster', 'slope', 'slope+-', 'norm', 'norm+-', 'scatter', 
+                                                           'scatter+-', 'scatter_perc_change'])
+    
+    return leave_one_rels, leave_one_pars
+
+
+# FROM MESSING AROUND WITH GEMINI TO PARALLELISE THE SCALING RELATION FITTING - MIGHT WORK IF I ALTERED THE 
+#  rpy2 LIRA fitting code - https://stackoverflow.com/questions/75069677/rpy2-throws-a-notimplementederror-concerning-conversion-rules
+# def process_sub_samp(sub_samp_id, sub_samp, x_cols, y_mult, y_norm, dim_hubb_ind, y_cols, x_norm, x_mult, y_name, x_name, full_relation):
+#     y_dat = Quantity(sub_samp[x_cols].values * y_mult, y_norm.unit) * (sub_samp['E'].values[..., None]**dim_hubb_ind)
+#     x_dat = Quantity(sub_samp[y_cols].values, x_norm.unit) * x_mult
+
+#     cur_subsamp_rel = scaling_relation_lira(y_dat[:, 0], y_dat[:, 1:], x_dat[:, 0], x_dat[:, 1:], y_norm, x_norm,
+#                                         y_name=y_name, x_name=x_name, dim_hubb_ind=dim_hubb_ind,
+#                                         point_names=sub_samp['name'].values)
+#     cur_subsamp_rel.author = 'Turner et al.'
+#     cur_subsamp_rel.year = 2025
+#     cur_subsamp_rel.name = sub_samp_id + " excluded"
+
+#     sc_perc_ch = round(((cur_subsamp_rel.scatter_par[0] - full_relation.scatter_par[0]) /
+#                        full_relation.scatter_par[0]) * 100, 3)
+
+#     return sub_samp_id, cur_subsamp_rel, sc_perc_ch
+
+
+# def leave_one_jackknife(full_samp, full_relation, x_cols=['Mhy500_wraderr', 'Mhy500_wraderr-', 'Mhy500_wraderr+'],
+#                         y_cols=['Tx_500', 'Tx_500-','Tx_500+'], x_name=r"$T_{\rm{X,500}}$",
+#                         y_name=r"$E(z)M^{\rm{tot}}_{500}$", dim_hubb_ind=1, x_mult=1, y_mult=1e+14,
+#                         x_norm=tx_norm, y_norm=m_norm):
+
+#     full_samp = full_samp.reset_index(drop=True)
+#     samp_inds = np.arange(0, len(full_samp))
+#     #samp_inds = np.arange(0, 10)  # For testing
+
+#     cur_sub_samps = {full_samp.loc[n, 'name']: full_samp.iloc[np.delete(samp_inds, n)]
+#                      for n in range(0, len(samp_inds))}
+
+#     leave_one_rels = {}
+#     leave_one_pars = []
+
+#     with tqdm(desc='Fitting sub-sample scaling relations', total=len(cur_sub_samps)) as onwards:
+#         with concurrent.futures.ThreadPoolExecutor() as executor:
+#             futures = [executor.submit(process_sub_samp, sub_samp_id, sub_samp, x_cols, y_mult, y_norm, dim_hubb_ind, y_cols, x_norm, x_mult, y_name, x_name, full_relation)
+#                        for sub_samp_id, sub_samp in cur_sub_samps.items()]
+
+#             for future in concurrent.futures.as_completed(futures):
+#                 sub_samp_id, cur_subsamp_rel, sc_perc_ch = future.result()
+#                 leave_one_rels[sub_samp_id] = cur_subsamp_rel
+#                 leave_one_pars.append([sub_samp_id, *(cur_subsamp_rel.pars[0, :].round(4)), *(cur_subsamp_rel.pars[1, :].round(4)),
+#                                       *(cur_subsamp_rel.scatter_par.round(4)), sc_perc_ch])
+#                 onwards.update(1)
+
+#     leave_one_pars = pd.DataFrame(leave_one_pars, columns=['dropped_cluster', 'slope', 'slope+-', 'norm', 'norm+-', 'scatter',
+#                                                             'scatter+-', 'scatter_perc_change'])
+
+#     return leave_one_rels, leave_one_pars
 
 
 # This function is used for getting axis limits for the the one to one comparison plots later
