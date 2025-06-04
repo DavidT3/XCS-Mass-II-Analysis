@@ -17,6 +17,7 @@ lovisari_cosmo = LambdaCDM(70, 0.3, 0.7)
 arnaud_cosmo = LambdaCDM(70, 0.3, 0.7)
 andreon_cosmo = LambdaCDM(70, 0.3, 0.7)
 kiiveri_cosmo = LambdaCDM(70, 0.27, 0.73)
+rozo_cosmo = LambdaCDM(70, 0.27, 0.73)
 
 
 # We set up the normalisations to be used for different properties when fitting relations here, so they
