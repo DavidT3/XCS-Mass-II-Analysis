@@ -30,6 +30,7 @@ mgas_norm = Quantity(1e+13, 'Msun')
 
 # These will be standard settings for figures
 rel_figsize = (7.3, 7)
+contour_figsize = (6, 6)
 
 
 def leave_one_jackknife(full_samp, full_relation, y_cols=['Mhy500_wraderr', 'Mhy500_wraderr-', 'Mhy500_wraderr+'], 
