@@ -28,6 +28,9 @@ rich_norm = Quantity(100, '')
 m_norm = Quantity(1e+14, 'Msun')
 mgas_norm = Quantity(1e+13, 'Msun')
 
+# These will be standard settings for figures
+rel_figsize = (7.3, 7)
+
 
 def leave_one_jackknife(full_samp, full_relation, y_cols=['Mhy500_wraderr', 'Mhy500_wraderr-', 'Mhy500_wraderr+'], 
                         x_cols=['Tx_500', 'Tx_500-','Tx_500+'], y_name=r"$E(z)M^{\rm{tot}}_{500}$", 
