@@ -32,6 +32,9 @@ mgas_norm = Quantity(1e+13, 'Msun')
 rel_figsize = (7.3, 7)
 contour_figsize = (6, 6)
 
+# These are SDSSRM-XCS clusters that have been generally blacklisted from our analyses
+CLUSTER_BLACKLIST = ['SDSSXCS-22']
+
 
 def leave_one_jackknife(full_samp, full_relation, y_cols=['Mhy500_wraderr', 'Mhy500_wraderr-', 'Mhy500_wraderr+'], 
                         x_cols=['Tx_500', 'Tx_500-','Tx_500+'], y_name=r"$E(z)M^{\rm{tot}}_{500}$", 
